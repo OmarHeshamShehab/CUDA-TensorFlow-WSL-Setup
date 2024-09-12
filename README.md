@@ -56,8 +56,7 @@ Optional but preferable from my point of view ubuntu latest one installed using 
     ![Point Number 42](image.png)
     
     43- Don't forget to run below commands to install tensorrt inside your environment:
-
-pip install nvidia-pyindex nvidia-tensorrt
+        pip install nvidia-pyindex nvidia-tensorrt
     44- Finally use below to validate your installation
     45-  ![Point Number 45](tf_Version.ipynb)
         
