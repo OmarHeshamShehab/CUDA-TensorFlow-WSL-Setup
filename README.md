@@ -3,7 +3,7 @@
     1- Open powershell as admin and type wsl --install
     2- Restart your password once it is opened create user name and password on PowerShell opened 
     3- Then open Ubuntu
-    4- ![alt text](image.png)
+    4- ![Point Number 4](image-1.png)
     5- Run this command sudo apt update && sudo apt upgrade -y
     6- Then we will need to install all essential packages required for upcoming installation sudo apt install build-essential -y
     7- Before starting installation of any component navigate to this https://www.tensorflow.org/install/source#gpu to verify the version compatibility for components 
