@@ -9,16 +9,16 @@
     7- Before starting installation of any component navigate to this https://www.tensorflow.org/install/source#gpu to verify the version compatibility for components 
     8- Specify your installation to which OS will be installed this is done as we don't need to install Nvidia driver through wsl it will passed through nvidia-smi to validate installation 
     9- Navigate to CUDA Toolkit Archive | NVIDIA Developer and download the version required.
-    10- 
+    10- ![Point Number 10](image.png)
     
     11- Download cuda 12.3 wget https://developer.download.nvidia.com/compute/cuda/12.3.2/local_installers/cuda_12.3.2_545.23.08_linux.run
     12- Install Cuda Toolkit using this command sudo sh cuda_12.3.2_545.23.08_linux.run
     13- Navigate to cuDNN Archive | NVIDIA Developer and download below
-    14- 
+    14- ![Point Number 14](image.png)
     15- https://developer.nvidia.com/downloads/compute/cudnn/secure/8.9.7/local_installers/12.x/cudnn-linux-x86_64-8.9.7.29_cuda12-archive.tar.xz/
     16- Navigate to your user path inside ubuntu and paste downloaded file for example mine is \\wsl.localhost\Ubuntu\home\tensorflow
     17- Also download tensorRT 8 as it is current supported version till now TensorRT Download | NVIDIA Developer it says it supports CUDA 12.0 & 12.1 but I tested it and supports also 12.3
-    18- 
+    18- ![Point Number 18](image.png)
     19- Extract Cuda Files using this command tar -xvf cudnn-linux-x86_64-8.9.7.29_cuda12-archive.tar.xz
     20- Navigate inside extracted file cd cudnn-linux-x86_64-8.9.7.29_cuda12-archive
     21- Copy all cudnn with extension h inside include directory sudo cp include/cudnn*.h /usr/local/cuda-12.3/include
@@ -53,14 +53,12 @@ Optional but preferable from my point of view ubuntu latest one installed using 
     42- Please take in consideration if you installed tensorflow 2.17.0 you will get below errors which I guess is normal as they are already mentioned in the docs below
     
     https://www.tensorflow.org/tutorials/quickstart/beginner#set_up_tensorflow
+    ![Point Number 42](image.png)
     
     43- Don't forget to run below commands to install tensorrt inside your environment:
 
 pip install nvidia-pyindex nvidia-tensorrt
     44- Finally use below to validate your installation
-
-
-    45- 
         
         
         
