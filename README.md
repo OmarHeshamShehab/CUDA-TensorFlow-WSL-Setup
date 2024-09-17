@@ -44,10 +44,10 @@ Optional but preferable from my point of view ubuntu latest one installed using 
     33- Download with wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     34- Install with this command bash ./Miniconda3-latest-Linux-x86_64.sh
     35- Create new folder mkdir projects
-    36- Create another folder mkdir tf216
-    37- Create environment with miniconda  conda create --name .tf216 python=3.11
-    38- Activate environment conda activate .tf216 
-    39- Install TensorFlow using this command python -m pip install tensorflow[and-cuda]==2.16.1
+    36- Create another folder mkdir .tf217
+    37- Create environment with miniconda  conda create --name .tf217 python=3.11
+    38- Activate environment conda activate .tf217 
+    39- Install TensorFlow using this command python -m pip install tensorflow[and-cuda]==2.17
     40- Command to verify TensorFlow installation with GPU python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
     41- You might get some warnings related to NUMA which I guess is fine as they are capabilities that might not be available in all motherboards 
     42- Please take in consideration if you installed tensorflow 2.17.0 you will get below errors which I guess is normal as they are already mentioned in the docs below
