@@ -1,4 +1,4 @@
-# wsl_ubuntu22.04_Tensorflow
+# Setting Up CUDA 12.3, cuDNN, and TensorRT with TensorFlow on WSL: A Step-by-Step Guide for GPU-Accelerated Machine Learning
 
     1- Open powershell as admin and type wsl --install
     2- Restart your password once it is opened create user name and password on PowerShell opened 
