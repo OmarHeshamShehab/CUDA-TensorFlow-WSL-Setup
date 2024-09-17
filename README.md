@@ -59,6 +59,8 @@ Optional but preferable from my point of view ubuntu latest one installed using 
         pip install nvidia-pyindex nvidia-tensorrt pycuda
     44- Finally use below to validate your installation
     45-  ![Point Number 45](tf_Version.ipynb)
+    46- The warnings related to NUMA (Non-Uniform Memory Access) are common and can generally be ignored unless you are working on systems or workloads that     
+        heavily rely on NUMA support.
         
         
         
