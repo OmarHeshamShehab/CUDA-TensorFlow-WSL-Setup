@@ -76,7 +76,7 @@ cd CUDA-TensorFlow-WSL-Setup
 
 ### 2. ✍️ Create the Installation Script
 
-> 💡 If the script is not already included, you can manually create it from the provided `script.txt` file:
+> 💡 Manually create it from the provided `script.txt` file:
 
 ```bash
 nano setup_tf_tf219.sh
