@@ -13,6 +13,7 @@
 - [🔧 Installation Steps](#-installation-steps)
 - [📂 Conda Environment Details](#-conda-environment-details)
 - [🧪 GPU Test Notebook](#-gpu-test-notebook)
+- [📁 Customizing TensorFlow Version](#-customizing-tensorflow-version)
 - [🧹 Clean-Up & Reuse](#-clean-up--reuse)
 - [❗ Troubleshooting](#-troubleshooting)
 - [📄 License](#-license)
@@ -125,6 +126,29 @@ python verify_tensorflow_gpu.ipynb
 ```
 
 The notebook will output the number of GPUs detected by TensorFlow.
+
+---
+
+## 📁 Customizing TensorFlow Version
+
+This setup script defaults to installing the latest available TensorFlow with GPU support.
+
+However, **you can install any TensorFlow version `>= 2.11`** by editing this line in the script:
+
+```bash
+pip install "tensorflow[and-cuda]"
+```
+
+For a specific version:
+
+```bash
+pip install "tensorflow==2.12.0"
+```
+
+> ⚠️ When changing TensorFlow versions, you may also need to update the **CUDA and cuDNN versions** accordingly.
+
+Refer to the official TensorFlow compatibility matrix for supported versions of CUDA, cuDNN, and Python:  
+🔗 [TensorFlow GPU Build Requirements](https://www.tensorflow.org/install/source#gpu)
 
 ---
 
