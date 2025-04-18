@@ -1,0 +1,121 @@
+#!/bin/bash
+
+set -e
+
+# ❌ Prevent running as root
+if [ "$EUID" -eq 0 ]; then
+  echo "❌ ERROR: Do NOT run this script as root or with sudo."
+  exit 1
+fi
+
+echo "✅ Running as user: $USER"
+
+# 🔄 Update system
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y build-essential wget curl gnupg software-properties-common python3-dev
+
+# 🧹 Cleanup handler
+CUDA_DEB="cuda-repo-wsl-ubuntu-12-5-local_12.5.0-1_amd64.deb"
+CUDNN_DEB="cudnn-local-repo-ubuntu2404-9.3.0_1.0-1_amd64.deb"
+trap 'rm -f $CUDA_DEB $CUDNN_DEB miniconda.sh 2>/dev/null || true' EXIT
+
+# ⚙️ Install CUDA if not already present
+if [ -d "/usr/local/cuda" ]; then
+  echo "⚙️ CUDA already installed — skipping."
+else
+  echo "➕ Installing CUDA 12.5..."
+  wget --show-progress https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
+  sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
+  wget --show-progress https://developer.download.nvidia.com/compute/cuda/12.5.0/local_installers/$CUDA_DEB
+  sudo dpkg -i $CUDA_DEB
+  sudo cp /var/cuda-repo-wsl-ubuntu-12-5-local/cuda-*-keyring.gpg /usr/share/keyrings/
+  sudo apt update
+  sudo apt install -y cuda
+  echo "✅ CUDA installed."
+fi
+
+# ➕ Install cuDNN 9.3.0 if not already installed
+if dpkg -l | grep -q libcudnn9; then
+  echo "✅ cuDNN 9.3 already installed — skipping."
+else
+  echo "➕ Installing cuDNN 9.3.0 (Ubuntu 24.04)..."
+  wget --show-progress https://developer.download.nvidia.com/compute/cudnn/9.3.0/local_installers/$CUDNN_DEB
+  sudo dpkg -i $CUDNN_DEB
+  sudo cp /var/cudnn-local-repo-ubuntu2404-9.3.0/cudnn-*-keyring.gpg /usr/share/keyrings/
+  sudo apt-get update
+  sudo apt-get install -y cudnn libcudnn-dev
+  echo "✅ cuDNN and dev headers installed."
+fi
+
+# ➕ Add CUDA paths to ~/.bashrc if missing
+if ! grep -q "/usr/local/cuda/bin" ~/.bashrc; then
+  echo "➕ Adding CUDA environment variables to ~/.bashrc..."
+  echo 'export PATH=/usr/local/cuda/bin:$PATH' >> ~/.bashrc
+  echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH' >> ~/.bashrc
+else
+  echo "✅ CUDA paths already exist in ~/.bashrc — skipping."
+fi
+
+# Apply CUDA paths immediately
+export PATH=/usr/local/cuda/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda/lib64:$LD_LIBRARY_PATH
+
+# 📥 Install Miniconda if not already installed
+if [ -f "$HOME/miniconda/bin/conda" ]; then
+  echo "✅ Miniconda already installed — skipping download."
+else
+  echo "📥 Installing Miniconda..."
+  wget --show-progress -O miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+  bash miniconda.sh -b -p "$HOME/miniconda"
+fi
+
+# Ensure Conda path is in bashrc and current session
+echo 'export PATH="$HOME/miniconda/bin:$PATH"' >> ~/.bashrc
+export PATH="$HOME/miniconda/bin:$PATH"
+
+# 🔁 Initialize Conda & disable auto base
+$HOME/miniconda/bin/conda init bash
+source ~/.bashrc
+conda config --set auto_activate_base false
+
+# 🔄 Update Conda base installation
+echo "🔄 Updating Conda base installation..."
+conda update -n base -c defaults conda -y
+
+# 🐍 Create Conda env
+echo "🐍 Creating Conda environment '.tf219' with Python 3.11..."
+conda create -n .tf219 python=3.11 -y
+
+# ✅ Activate safely
+echo "✅ Activating .tf219 environment..."
+source "$HOME/miniconda/etc/profile.d/conda.sh"
+conda activate .tf219
+
+# 📦 Install C++ stdlib fix for pycuda
+echo "📦 Installing libstdcxx-ng (for GLIBCXX_3.4.32 support)..."
+conda install -c conda-forge libstdcxx-ng -y
+
+# 📦 Install TensorFlow with GPU support
+echo "📦 Installing TensorFlow with GPU support..."
+pip install "tensorflow[and-cuda]"
+
+# 📦 Install pycuda and TensorRT
+echo "📦 Installing pycuda and tensorrt..."
+pip install pycuda
+pip install nvidia-pyindex
+pip install tensorrt
+
+# 📦 Install GPU CLI tools (optional)
+echo "📦 Installing GPU CLI tools (nvidia-smi)..."
+sudo apt install -y nvidia-utils-525 || true
+
+# 🧹 Clean APT cache
+echo "🧹 Cleaning APT package cache..."
+sudo apt clean
+
+# ✅ Done
+echo ""
+echo "🎉 Full setup complete!"
+echo "👉 To activate later: conda activate .tf219"
+echo "🧪 To test GPU use in Python:"
+echo 'python your_test_script.py'

@@ -45,21 +45,21 @@ It includes a **Jupyter Notebook** to verify GPU availability inside TensorFlow.
 
 ## 📜 What the Script Does
 
-1. Checks that you're not root
-2. Updates the system & installs build essentials
+1. Checks that you're not root  
+2. Updates the system and installs essential build tools  
 3. Installs:
-   - CUDA 12.5
-   - cuDNN 9.3.0
-4. Adds CUDA to your environment
-5. Installs Miniconda & configures Conda
-6. Creates Conda environment `.tf219` with Python 3.11
-7. Installs:
-   - TensorFlow (GPU)
-   - PyCUDA
-   - TensorRT
-   - `libstdcxx-ng` (for GLIBCXX compatibility)
-8. Installs GPU CLI tools (e.g., `nvidia-smi`)
-9. Cleans up leftover installers and cache
+   - **CUDA 12.5**
+   - **cuDNN 9.3.0**
+4. Adds CUDA environment variables to your `.bashrc` and current session  
+5. Installs **Miniconda**, initializes Conda, and disables auto base activation  
+6. Creates a dedicated Conda environment named `.tf219` with **Python 3.11**  
+7. Installs into the `.tf219` environment:
+   - **TensorFlow 2.19 with GPU support**
+   - **PyCUDA**
+   - **TensorRT**
+   - `libstdcxx-ng` (to fix `GLIBCXX_3.4.32` compatibility for PyCUDA)  
+8. Optionally installs **NVIDIA GPU CLI tools** (`nvidia-smi`)  
+9. Cleans up installer files and APT package cache to save space  
 
 ---
 
@@ -74,18 +74,32 @@ cd CUDA-TensorFlow-WSL-Setup
 
 ---
 
-### 2. ✅ Make the Script Executable
+### 2. ✍️ Create the Installation Script
+
+> 💡 If the script is not already included, you can manually create it from the provided `script.txt` file:
 
 ```bash
-chmod +x setup_gpu_env.sh
+nano setup_tf_tf219.sh
+```
+
+- Paste the contents of `script.txt` into the terminal (select all, copy, then paste)
+- Save the file with: `Ctrl + O`, then `Enter`
+- Exit the editor with: `Ctrl + X`
+
+---
+
+### 3. ✅ Make the Script Executable
+
+```bash
+chmod +x setup_tf_tf219.sh
 ```
 
 ---
 
-### 3. 🚫 Run the Script as a Normal User
+### 4. 🚫 Run the Script as a Normal User
 
 ```bash
-./setup_gpu_env.sh
+./setup_tf_tf219.sh
 ```
 
 > ⚠️ **Do not use `sudo`** — the script calls `sudo` only when required.
@@ -96,7 +110,7 @@ chmod +x setup_gpu_env.sh
 
 | Name     | Python Version | Packages Installed                   |
 |----------|----------------|--------------------------------------|
-| `.tf219` | 3.11           | TensorFlow (GPU), pycuda, tensorrt, libstdcxx-ng |
+| `.tf219` | 3.11           | TensorFlow 2.19 (GPU), PyCUDA, TensorRT, libstdcxx-ng |
 
 To activate later:
 
@@ -131,7 +145,7 @@ The notebook will output the number of GPUs detected by TensorFlow.
 
 ## 📁 Customizing TensorFlow Version
 
-This setup script defaults to installing the latest available TensorFlow with GPU support.
+This setup script defaults to installing **TensorFlow 2.19**.
 
 However, **you can install any TensorFlow version `>= 2.11`** by editing this line in the script:
 
