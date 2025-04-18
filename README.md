@@ -69,7 +69,6 @@ It includes a **Jupyter Notebook** to verify GPU availability inside TensorFlow.
 
 ```bash
 git clone https://github.com/OmarHeshamShehab/CUDA-TensorFlow-WSL-Setup.git
-cd CUDA-TensorFlow-WSL-Setup
 ```
 
 ---
