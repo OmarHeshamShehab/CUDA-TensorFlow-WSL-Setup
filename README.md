@@ -155,7 +155,7 @@ pip install "tensorflow[and-cuda]"
 For a specific version:
 
 ```bash
-pip install "tensorflow==2.12.0"
+pip install "tensorflow==2.19.0"
 ```
 
 > ⚠️ When changing TensorFlow versions, you may also need to update the **CUDA and cuDNN versions** accordingly.
