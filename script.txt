@@ -78,6 +78,11 @@ $HOME/miniconda/bin/conda init bash
 source ~/.bashrc
 conda config --set auto_activate_base false
 
+# ➕ Accept Conda Terms of Service for the required channels
+echo "➕ Accepting Conda Terms of Service for main and r channels..."
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
+conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
+
 # 🔄 Update Conda base installation
 echo "🔄 Updating Conda base installation..."
 conda update -n base -c defaults conda -y
@@ -104,6 +109,10 @@ echo "📦 Installing pycuda and tensorrt..."
 pip install pycuda
 pip install nvidia-pyindex
 pip install tensorrt
+
+# 📦 Install numpy, pandas, matplotlib, seaborn
+echo "📦 Installing numpy, pandas, matplotlib, seaborn..."
+pip install numpy pandas matplotlib seaborn
 
 # 📦 Install GPU CLI tools (optional)
 echo "📦 Installing GPU CLI tools (nvidia-smi)..."
