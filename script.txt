@@ -1,4 +1,5 @@
 #!/bin/bash
+# 🚀 TensorFlow 2.20 GPU Installer (Universal for Ubuntu 20.04, 22.04, 24.04)
 
 set -e
 
@@ -12,14 +13,26 @@ echo "✅ Running as user: $USER"
 
 # 🔄 Update system
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y build-essential wget curl gnupg software-properties-common python3-dev
+sudo apt install -y build-essential wget curl gnupg software-properties-common python3-dev lsb-release
 
 # 🧹 Cleanup handler
 CUDA_DEB="cuda-repo-wsl-ubuntu-12-5-local_12.5.0-1_amd64.deb"
-CUDNN_DEB="cudnn-local-repo-ubuntu2404-9.3.0_1.0-1_amd64.deb"
-trap 'rm -f $CUDA_DEB $CUDNN_DEB miniconda.sh 2>/dev/null || true' EXIT
+trap 'rm -f $CUDA_DEB cudnn*.deb miniconda.sh 2>/dev/null || true' EXIT
 
-# ⚙️ Install CUDA if not already present
+# ⚡ Detect Ubuntu version
+UBUNTU_VERSION=$(lsb_release -rs)
+echo "🔎 Detected Ubuntu $UBUNTU_VERSION"
+
+# ⚡ Detect GPU (basic)
+if command -v nvidia-smi &>/dev/null; then
+  GPU_NAME=$(nvidia-smi --query-gpu=gpu_name --format=csv,noheader | head -n1)
+  DRIVER_VERSION=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader | head -n1)
+  echo "🎮 GPU detected: $GPU_NAME (Driver $DRIVER_VERSION)"
+else
+  echo "⚠️ No NVIDIA driver detected. Please install the latest driver (>= 550) before using TensorFlow."
+fi
+
+# ⚙️ Install CUDA 12.5 if not already present
 if [ -d "/usr/local/cuda" ]; then
   echo "⚙️ CUDA already installed — skipping."
 else
@@ -31,20 +44,36 @@ else
   sudo cp /var/cuda-repo-wsl-ubuntu-12-5-local/cuda-*-keyring.gpg /usr/share/keyrings/
   sudo apt update
   sudo apt install -y cuda
-  echo "✅ CUDA installed."
+  echo "✅ CUDA 12.5 installed."
 fi
 
-# ➕ Install cuDNN 9.3.0 if not already installed
+# ➕ Install cuDNN 9.3 (per Ubuntu version)
 if dpkg -l | grep -q libcudnn9; then
   echo "✅ cuDNN 9.3 already installed — skipping."
 else
-  echo "➕ Installing cuDNN 9.3.0 (Ubuntu 24.04)..."
+  echo "➕ Installing cuDNN 9.3.0..."
+  case "$UBUNTU_VERSION" in
+    20.04)
+      CUDNN_DEB="cudnn-local-repo-ubuntu2004-9.3.0_1.0-1_amd64.deb"
+      ;;
+    22.04)
+      CUDNN_DEB="cudnn-local-repo-ubuntu2204-9.3.0_1.0-1_amd64.deb"
+      ;;
+    24.04)
+      CUDNN_DEB="cudnn-local-repo-ubuntu2404-9.3.0_1.0-1_amd64.deb"
+      ;;
+    *)
+      echo "❌ Unsupported Ubuntu version: $UBUNTU_VERSION"
+      exit 1
+      ;;
+  esac
+
   wget --show-progress https://developer.download.nvidia.com/compute/cudnn/9.3.0/local_installers/$CUDNN_DEB
   sudo dpkg -i $CUDNN_DEB
-  sudo cp /var/cudnn-local-repo-ubuntu2404-9.3.0/cudnn-*-keyring.gpg /usr/share/keyrings/
-  sudo apt-get update
-  sudo apt-get install -y cudnn libcudnn-dev
-  echo "✅ cuDNN and dev headers installed."
+  sudo cp /var/cudnn-local-repo-ubuntu*/cudnn-*-keyring.gpg /usr/share/keyrings/
+  sudo apt update
+  sudo apt install -y cudnn libcudnn-dev
+  echo "✅ cuDNN 9.3 installed."
 fi
 
 # ➕ Add CUDA paths to ~/.bashrc if missing
@@ -69,62 +98,65 @@ else
   bash miniconda.sh -b -p "$HOME/miniconda"
 fi
 
-# Ensure Conda path is in bashrc and current session
+# Ensure Conda path
 echo 'export PATH="$HOME/miniconda/bin:$PATH"' >> ~/.bashrc
 export PATH="$HOME/miniconda/bin:$PATH"
 
-# 🔁 Initialize Conda & disable auto base
+# 🔁 Initialize Conda
 $HOME/miniconda/bin/conda init bash
 source ~/.bashrc
 conda config --set auto_activate_base false
 
-# ➕ Accept Conda Terms of Service for the required channels
-echo "➕ Accepting Conda Terms of Service for main and r channels..."
+# ➕ Accept Conda Terms of Service
 conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main
 conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r
 
-# 🔄 Update Conda base installation
-echo "🔄 Updating Conda base installation..."
+# 🔄 Update Conda
 conda update -n base -c defaults conda -y
 
 # 🐍 Create Conda env
-echo "🐍 Creating Conda environment '.tf219' with Python 3.11..."
-conda create -n .tf219 python=3.11 -y
+echo "🐍 Creating Conda environment '.tf220' with Python 3.11..."
+conda create -n .tf220 python=3.11 -y
 
 # ✅ Activate safely
-echo "✅ Activating .tf219 environment..."
+echo "✅ Activating .tf220 environment..."
 source "$HOME/miniconda/etc/profile.d/conda.sh"
-conda activate .tf219
+conda activate .tf220
 
-# 📦 Install C++ stdlib fix for pycuda
-echo "📦 Installing libstdcxx-ng (for GLIBCXX_3.4.32 support)..."
+# 📦 Install C++ stdlib fix
 conda install -c conda-forge libstdcxx-ng -y
 
-# 📦 Install TensorFlow with GPU support
-echo "📦 Installing TensorFlow with GPU support..."
-pip install "tensorflow[and-cuda]"
+# 📦 Install TensorFlow 2.20 GPU
+pip install "tensorflow[and-cuda]==2.20.*"
 
-# 📦 Install pycuda and TensorRT
-echo "📦 Installing pycuda and tensorrt..."
-pip install pycuda
-pip install nvidia-pyindex
-pip install tensorrt
+# 📦 Install pycuda + TensorRT
+pip install pycuda nvidia-pyindex tensorrt
 
-# 📦 Install numpy, pandas, matplotlib, seaborn
-echo "📦 Installing numpy, pandas, matplotlib, seaborn..."
+# 📦 Install common packages
 pip install numpy pandas matplotlib seaborn
 
-# 📦 Install GPU CLI tools (optional)
-echo "📦 Installing GPU CLI tools (nvidia-smi)..."
-sudo apt install -y nvidia-utils-525 || true
+# 📦 Ensure nvidia-smi
+if command -v nvidia-smi &>/dev/null; then
+  echo "✅ nvidia-smi already available — skipping."
+else
+  echo "➕ Installing matching nvidia-utils..."
+  DRIVER_PKG=$(apt-cache search --names-only '^nvidia-utils-[0-9]+' \
+    | awk '{print $1}' \
+    | sort -V \
+    | tail -n 1)
+  if [ -n "$DRIVER_PKG" ]; then
+    sudo apt install -y "$DRIVER_PKG"
+  else
+    echo "⚠️ Could not auto-detect nvidia-utils package — skipping."
+  fi
+fi
 
 # 🧹 Clean APT cache
-echo "🧹 Cleaning APT package cache..."
 sudo apt clean
 
 # ✅ Done
 echo ""
-echo "🎉 Full setup complete!"
-echo "👉 To activate later: conda activate .tf219"
-echo "🧪 To test GPU use in Python:"
-echo 'python your_test_script.py'
+echo "🎉 Full TensorFlow 2.20 GPU setup complete!"
+echo "👉 To activate later: conda activate .tf220"
+echo "🧪 To test GPU in Python:"
+echo 'python -c "import tensorflow as tf; print(tf.config.list_physical_devices(\"GPU\"))"'
