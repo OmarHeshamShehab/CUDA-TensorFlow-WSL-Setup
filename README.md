@@ -16,7 +16,6 @@
 - [📁 Customizing TensorFlow Version](#-customizing-tensorflow-version)
 - [🧹 Clean-Up & Reuse](#-clean-up--reuse)
 - [❗ Troubleshooting](#-troubleshooting)
-- [📄 License](#-license)
 - [👨‍💻 Author](#-author)
 
 ---
@@ -179,12 +178,6 @@ Refer to the official TensorFlow compatibility matrix for supported versions of 
   - You’re in the `.tf220` environment
   - You installed correct NVIDIA drivers (≥ 550)
   - Your GPU is **Pascal or newer (Compute Capability ≥ 6.0)**  
-
----
-
-## 📄 License
-
-This repository and script are open-sourced under the MIT License. Use and modify freely.
 
 ---
 
